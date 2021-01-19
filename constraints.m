@@ -3,7 +3,6 @@ function [cineq] = constraints(X,U,e,data,params)
 %   Detailed explanation goes here
     ModelParams=bycicle_params();
     N = length(X);
-    traj = params.traj;
     trackWidth = params.trackWidth;
     track = params.track;
     cineq = [];
@@ -13,13 +12,12 @@ function [cineq] = constraints(X,U,e,data,params)
 
        x_i = state_i(ModelParams.stateindex_x);
        y_i = state_i(ModelParams.stateindex_y);
-       theta_i = state_i(ModelParams.stateindex_theta);
-       xc_i = ppval(traj.ppx,theta_i);
-       yc_i = ppval(traj.ppy,theta_i);
-        
-       err = norm([x_i;y_i] - [xc_i;yc_i]);
        
-       cineq = [cineq;err - trackWidth/2;input_i(3)-0.8];
+       p = round(([x_i; y_i]-[track.xmin;track.ymin])/track.step); % get rows and cols for current position on distance mat
+       [rows, cols] = size(track.D); % get num rows and cols of distance matrix
+       err = track.D(rows-p(2), p(1)); % evaluate distance from [xc, yc]
+       err = double(err);        
+       cineq = [cineq;err - trackWidth/2];
        
     end
     

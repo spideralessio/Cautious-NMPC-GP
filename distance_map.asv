@@ -42,8 +42,8 @@ step = 10^(-round_n)
 rows = (ymax-ymin)/step;
 cols = (xmax-xmin)/step;
 
-mat = zeros(rows, cols);
-mat_idx = zeros(rows, cols);
+mat = zzeros(rows, cols);eros(rows, cols);
+mat_idx = 
 points = length(track.center);
 
 track.center_rounded = []
@@ -51,37 +51,21 @@ for i=1:length(track.center)
    p = round(track.center(:,i),round_n);
    track.center_rounded = [track.center_rounded, p];
    p = round((p-[xmin;ymin])/step);
+   if(mat(rows-p(2), p(1))) == 1
+       disp "hey";
+   end
    mat(rows-p(2), p(1)) = 1;
-   mat_idx(rows-p(2), p(1)) = i;
 end
 
 assert(points == length(track.center_rounded))
 
-progress = zeros(points, points);
+adjacency = zeros(points, points);
 
-for i=2:points
-    d = norm(track.center_rounded(:,i) - track.center_rounded(:,i-1));
+for i=2:N
+    d = norm(track.center_rounded(:,i) - track.center_rounded(:,i));
     for j=1:i-1
-        progress(j, i) = progress(j, i) + d;
-        progress(i, j) = progress(i, j) - d;
+        adjacency(j, i) = adjacency(j, i) + d;
+        adjacency(i, j) = adjacency(i, j) - d;
     end
 end
 
-[D,idx] = bwdist(mat);
-
-for r=1:rows
-    for c=1:cols
-        idx(r,c) = mat_idx(idx(r,c));
-    end
-end
-
-D = D*step;
-
-track.D = D;
-track.idx = idx;
-track.progress = progress;
-track.round_n = round_n;
-track.step = step;
-track.xmin = xmin;
-track.ymin = ymin;
-save("track.mat", "track")
