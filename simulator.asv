@@ -48,27 +48,26 @@ nloptions.Parameters = {params};
 nlobj.Optimization.CustomCostFcn = @cost_function;
 nlobj.Optimization.CustomIneqConFcn = @constraints;
 nlobj.Optimization.SolverOptions.MaxIter = 10;
-nlobj.PredictionHorizon = 40;
-nlobj.ControlHorizon = 40;
+nlobj.PredictionHorizon = 10;
+
 [u, opt, info] = nlmpcmove(nlobj,x,u,[],[],nloptions);
 
 
 for i=1:100
     [u, opt, info] = nlmpcmove(nlobj,x,u,[],[],nloptions)
-    u = info.MVopt(1,:)';
+%     u = info.MVopt(1,:)'
     x = bycicle_step(x, u, Ts)
     
     hold off
     figure(1);
     plot(track.outer(1,:),track.outer(2,:),'r')
     hold on
+    scatter(xc_i, yc_i);
     plot(info.Xopt(:,1), info.Xopt(:,2), 'b');
-    c = [];
+    c = []
     for j=1:length(info.Xopt)
-       c = [c, get_c(info.Xopt(j,:)', track)];
-    end
     
-    scatter(c(1,:), c(2,:))
+    
     plot(track.inner(1,:),track.inner(2,:),'r')
     plot(track.center(1,:),track.center(2,:),'--r')
     carBox(x,ModelParams.W/2,ModelParams.L/2)

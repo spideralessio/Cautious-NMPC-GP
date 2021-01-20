@@ -23,9 +23,6 @@ function [final_cost] = cost_function(X,U,e,data,params)
        
        p = round(([x_i; y_i]-[track.xmin;track.ymin])/track.step); % get rows and cols for current position on distance mat
        [rows, cols] = size(track.D); % get num rows and cols of distance matrix
-%        [x_i, y_i, p(1), p(2)]
-       p = max(p,1);
-       p = min(p,[cols;rows-1]);
        idx = track.idx(rows-p(2), p(1)); % get index of [xc, yc] in track.center_rounded
        xc_i = track.center_rounded(1,idx);
        yc_i = track.center_rounded(2,idx);
@@ -35,24 +32,24 @@ function [final_cost] = cost_function(X,U,e,data,params)
            phi_i = atan2(track.center_rounded(2,idx+1)- yc_i, track.center_rounded(1,idx+1)- xc_i) - pi;
        end
        
-       if i>=1
+       if i>1
            el_i = -cos(phi_i)*(x_i - xc_i) - sin(phi_i)*(y_i-yc_i);
            ec_i = sin(phi_i)*(x_i - xc_i) - cos(phi_i)*(y_i-yc_i);
 
-%            lreg_i = norm(input_i - U(i-1,:)')^2;
+           lreg_i = norm(input_i - U(i-1,:)')^2;
            
-%            progress = track.progress(last_idx, idx);
-%            if idx > length(track.center)
-%                 progress = -progress
-%                 idx = mod(idx, track.points)
-%            end
-%            progress
-%            lreg_i
-%            ec_i
-%            el_i
-%            idx
-%             lreg_i = 1;
-           final_cost = final_cost + 5*el_i^2 + 5*ec_i^2;%- gamma*progress + lreg_i;
+           progress = track.progress(last_idx, idx);
+           if idx > length(track.center)
+                progress = -progress
+                idx = mod(idx, track.points)
+           end
+           progress
+           lreg_i
+           ec_i
+           el_i
+           idx
+            lreg_i = 1;
+           final_cost = final_cost + el_i^2 + ec_i^2 - gamma*progress + lreg_i;
        end
        last_idx = idx;
     end

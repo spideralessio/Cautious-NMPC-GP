@@ -57,13 +57,15 @@ end
 
 assert(points == length(track.center_rounded))
 
+
 progress = zeros(points, points);
 
 for i=2:points
     d = norm(track.center_rounded(:,i) - track.center_rounded(:,i-1));
     for j=1:i-1
-        progress(j, i) = progress(j, i) + d;
-        progress(i, j) = progress(i, j) - d;
+        p = progress(j,i-1) + d;
+        progress(j, i) = p;
+        progress(i, j) = -p;
     end
 end
 

@@ -15,11 +15,9 @@ function [cineq] = constraints(X,U,e,data,params)
        
        p = round(([x_i; y_i]-[track.xmin;track.ymin])/track.step); % get rows and cols for current position on distance mat
        [rows, cols] = size(track.D); % get num rows and cols of distance matrix
-       p = max(p,1);
-       p = min(p,[cols;rows-1]);
        err = track.D(rows-p(2), p(1)); % evaluate distance from [xc, yc]
        err = double(err);        
-       cineq = [cineq;err - trackWidth/2];
+       cineq = [cineq;err - trackWidth/2; track.xmin-x_i; track.ymin-y_i];
        
     end
     
