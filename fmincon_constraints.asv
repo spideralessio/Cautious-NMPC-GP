@@ -1,11 +1,11 @@
-function [cineq, ceq] = constraints(X_flat,params)
+function [cineq, ceq] = fmconstraints(X_flat,params)
     ModelParams=bycicle_params();
     Horizon = params.Horizon;
     X = reshape(X_flat, Horizon, []);
     X_x = X(:, 1:ModelParams.nx);
     X_u = X(:, ModelParams.nx+1: ModelParams.nx+ModelParams.nu);
     
-    
+    n = ModelParams.nx + ModelParams.nu;
     trackWidth = params.trackWidth;
     track = params.track;
     cineq = zeros(Horizon, 1);
@@ -31,9 +31,12 @@ function [cineq, ceq] = constraints(X_flat,params)
     end
     
     
-    ceq = zeros(,1);
+    ceq = zeros((Horizon-1)*ModelParams.nx,1);
     for i=1:Horizon-1
-        ceq(
+        state_i = X_x(i,:)';
+        input_i = X_u(i,:)';
+        state_next = state_i + params.Ts*bycicle_model(state_i, input_i);
+        ceq(1 + (i-1)*ModelParams.nx:ModelParams.nx + (i-1)*ModelParams.nx,1) = X_x(i+1,:)' - state_next;
     end
     
     
