@@ -2,9 +2,9 @@ clear
 clc
 load track.mat
 
-Ts = 0.02;
+Ts = 0.05;
 
-startIdx = 1 % index of starting point on track
+startIdx = 20; % index of starting point on track
 last_closestIdx = startIdx;
 
 ModelParams = bycicle_params();
@@ -31,9 +31,10 @@ u = [0;0];
 
 
 
-nlobj = nlmpc(ModelParams.nx,ModelParams.nx,ModelParams.nu);
+nlobj = nlmpc(ModelParams.nx,1,ModelParams.nu);
 nlobj.Ts = Ts;
 nlobj.Model.StateFcn = @bycicle_model;
+nlobj.Model.OutputFcn = @output_fn;
 nlobj.MV(1).Min = ModelParams.Dmin;
 nlobj.MV(1).Max = ModelParams.Dmax;
 nlobj.MV(2).Min = ModelParams.deltamin;
@@ -46,25 +47,35 @@ params.track = track;
 params.trackWidth = trackWidth;
 nloptions.Parameters = {params};
 nlobj.Optimization.CustomCostFcn = @cost_function;
+nlobj.Optimization.ReplaceStandardCost = true;
 nlobj.Optimization.CustomIneqConFcn = @constraints;
 nlobj.Optimization.SolverOptions.MaxIter = 10;
-nlobj.PredictionHorizon = 40;
-nlobj.ControlHorizon = 40;
-[u, opt, info] = nlmpcmove(nlobj,x,u,[],[],nloptions);
+nlobj.PredictionHorizon = 5;
+nlobj.ControlHorizon = 5;
+nlobj.State(1).Min = ModelParams.Xmin;
+nlobj.State(2).Min = ModelParams.Ymin;
+nlobj.State(1).Max = ModelParams.Xmax;
+nlobj.State(2).Max = ModelParams.Ymax;
 
+nlobj.Weights.ManipulatedVariablesRate = [0.5,0.5];
 
 for i=1:100
     [u, opt, info] = nlmpcmove(nlobj,x,u,[],[],nloptions)
-    u = info.MVopt(1,:)';
+%     if info.ExitFlag < 0
+%         u = unew
+%     end
     x = bycicle_step(x, u, Ts)
-    
+%     u = info.MVopt(2,:)'
+    info.ExitFlag
+    constraints(info.Xopt, info.MVopt, 0, 0, params)
     hold off
     figure(1);
     plot(track.outer(1,:),track.outer(2,:),'r')
     hold on
     plot(info.Xopt(:,1), info.Xopt(:,2), 'b');
     c = [];
-    for j=1:length(info.Xopt)
+    [l, ~] = size(info.Xopt);
+    for j=1:l
        c = [c, get_c(info.Xopt(j,:)', track)];
     end
     

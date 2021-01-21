@@ -1,0 +1,29 @@
+function [A, b, Aeq, beq, lb, ub] = getMatrices(X, params)
+Horizon = params.Horizon
+
+ModelParams=bycicle_params();
+A = [];
+b = [];
+
+
+Aeq = [];
+beq = [];
+
+n = ModelParams.nx + ModelParams.nu;
+
+%set x(0) = x0
+for i=1:ModelParams.nx
+    a = zeros(length(X));
+    a(i) = 1;
+    Aeq = [Aeq; a];
+    beq = [beq; X(i)];
+end
+
+
+lb = [];
+ub = [];
+for i=1:Horizon
+    lb = [lb; [ModelParams.Xmin, ModelParams.Ymin, 0,0,0,0, ModelParams.Dmin, ModelParams.deltamin]'];
+    ub = [ub; [ModelParams.Xmax, ModelParams.Ymax, 0,0,0,0, ModelParams.Dmax, ModelParams.deltamax]'];
+end
+

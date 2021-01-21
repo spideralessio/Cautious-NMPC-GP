@@ -57,8 +57,12 @@ ModelParams.W = 0.06;
 
 ModelParams.Dmax = 1;
 ModelParams.Dmin = 0.25;
-ModelParams.deltamax = inf;
-ModelParams.deltamin = -inf;
+ModelParams.deltamax = pi;
+ModelParams.deltamin = -pi;
 
 
+ModelParams.Xmin = -1.5;
+ModelParams.Xmax = 2;
+ModelParams.Ymin = -2;
+ModelParams.Ymax = 2;
 end
