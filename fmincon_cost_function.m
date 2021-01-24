@@ -9,8 +9,8 @@ function [final_cost, cost_gradient] = fmincon_cost_function(X_flat, params)
     final_cost = 0;
     track = params.track;
     trackWidth = params.trackWidth;
-    gamma = 1;
-    error_factor = 1;
+    gamma = 0.3;
+    error_factor = 3;
     reg_factor = 1;
     
     cost_gradient = zeros(size(X_flat));
