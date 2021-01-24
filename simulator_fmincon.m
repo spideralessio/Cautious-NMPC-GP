@@ -4,7 +4,7 @@ load track.mat
 
 Ts = 0.05;
 
-startIdx = 600;
+startIdx = 1;
 last_closestIdx = startIdx;
 
 ModelParams = bycicle_params();
@@ -19,7 +19,7 @@ x0 = [track.center(1,startIdx),track.center(2,startIdx),... % point on centerlin
   
 u0 = [0;0];
 
-Horizon = 10;
+Horizon = 20;
 params = struct;
 params.track = track;
 params.trackWidth = trackWidth;
@@ -37,7 +37,7 @@ end
 
 X = [X_x, X_u]; %(horizon, n) = (horizon, nx+nu)
 X_flat = reshape(X',[],1); %(horizon*n,1)
-options = optimoptions('fmincon','Display','none','Algorithm','sqp', 'MaxIterations',20);
+options = optimoptions('fmincon','Display','none','Algorithm','sqp', 'MaxIterations',200,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);
 
 
 f = @(x)fmincon_cost_function(x, params); %create wrapper for cost function
@@ -58,6 +58,7 @@ for i=1:2000
     u
     exitflag
     fval
+    
     
     plot_car(X_x, track);
     x = bycicle_step(x, u, Ts);
