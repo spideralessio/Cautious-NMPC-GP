@@ -21,7 +21,7 @@ end
 lb = -inf*ones(length(X),1);
 ub = inf*ones(length(X),1);
 for i=1:Horizon
-    lb(1 + n*(i-1):n + n*(i-1),1) = [ModelParams.Xmin, ModelParams.Ymin, -Inf,-Inf,-Inf, -Inf, ModelParams.Dmin, ModelParams.deltamin]';
-    ub(1 + n*(i-1):n + n*(i-1),1) = [ModelParams.Xmax, ModelParams.Ymax, Inf, Inf, Inf, Inf, ModelParams.Dmax, ModelParams.deltamax]';
+    lb(1 + n*(i-1):n + n*(i-1),1) = [ModelParams.Xmin, ModelParams.Ymin, -Inf,-Inf,-Inf, -Inf, -Inf, ModelParams.Dmin, ModelParams.deltamin, 0]';
+    ub(1 + n*(i-1):n + n*(i-1),1) = [ModelParams.Xmax, ModelParams.Ymax, Inf, Inf, Inf, Inf, Inf, ModelParams.Dmax, ModelParams.deltamax, 2]';
 end
 

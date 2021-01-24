@@ -113,20 +113,21 @@ function [grad]=DiscretizedLinearizedModel(Xbar_k,Ubar_k)
  
   % Jacobians
   
-  Ac=[0 0  df1_dphi        df1_dvx         df1_dvy        0          ;
-      0 0  df2_dphi        df2_dvx         df2_dvy        0          ;
-      0 0  0               0               0              df3_domega;
-      0 0  0               df4_dvx         df4_dvy        df4_domega;
-      0 0  0               df5_dvx         df5_dvy        df5_domega;
-      0 0  0               df6_dvx         df6_dvy        df6_domega];
+  Ac=[0 0  df1_dphi        df1_dvx         df1_dvy        0           0;
+      0 0  df2_dphi        df2_dvx         df2_dvy        0           0;
+      0 0  0               0               0              df3_domega  0;
+      0 0  0               df4_dvx         df4_dvy        df4_domega  0;
+      0 0  0               df5_dvx         df5_dvy        df5_domega  0;
+      0 0  0               df6_dvx         df6_dvy        df6_domega  0;
+      0 0  0               0               0              0           0];
   
-  Bc=[0         0           ;
-      0         0           ;
-      0         0           ;
-      df4_dD    df4_ddelta  ;
-      0         df5_ddelta  ;
-      0         df6_ddelta  ];
-    
+  Bc=[0         0            0;
+      0         0            0;
+      0         0            0;
+      df4_dD    df4_ddelta   0;
+      0         df5_ddelta   0;
+      0         df6_ddelta   0;
+      0         0            1];
 
     
   grad = [Ac Bc]';

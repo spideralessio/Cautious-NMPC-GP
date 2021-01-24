@@ -27,6 +27,7 @@ function xdot=bycicle_model(x,u,params)
     omega   =x(ModelParams.stateindex_omega);
     D     =u(ModelParams.inputindex_D);
     delta =u(ModelParams.inputindex_delta);
+    vtheta =u(ModelParams.inputindex_vtheta);
     
     alpha_f = -atan2(l_f*omega + v_y,abs(v_x))+delta;
     alpha_r =  atan2(l_r*omega - v_y,abs(v_x));
@@ -41,7 +42,8 @@ function xdot=bycicle_model(x,u,params)
        omega;
        1/m*(F_rx - F_fy*sin(delta) + m*v_y*omega);
        1/m*(F_ry + F_fy*cos(delta) - m*v_x*omega);
-       1/Iz*(F_fy*l_f*cos(delta)- F_ry*l_r)];
+       1/Iz*(F_fy*l_f*cos(delta)- F_ry*l_r);
+       vtheta];
 
     
 return

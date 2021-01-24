@@ -2,7 +2,7 @@ clear
 clc
 load track.mat
 
-Ts = 0.02;
+Ts = 0.03;
 
 startIdx = 1;
 last_closestIdx = startIdx;
@@ -15,11 +15,11 @@ trackWidth = norm(track.inner(:,1)-track.outer(:,1));
 
 x0 = [track.center(1,startIdx),track.center(2,startIdx),... % point on centerline
       atan2(track.center(2,startIdx+1) - track.center(2,startIdx), track.center(1,startIdx+1) - track.center(1,startIdx)),... % aligned with centerline
-      vx0 ,0, 0]';
+      vx0 ,0, 0, track.progress(1, startIdx)]';
   
-u0 = [0;0];
+u0 = [0;0;vx0];
 
-Horizon = 50;
+Horizon = 30;
 params = struct;
 params.track = track;
 params.trackWidth = trackWidth;
@@ -37,7 +37,7 @@ end
 
 X = [X_x, X_u]; %(horizon, n) = (horizon, nx+nu)
 X_flat = reshape(X',[],1); %(horizon*n,1)
-options = optimoptions('fmincon','Display','none','Algorithm','sqp', 'MaxIterations',50,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);
+options = optimoptions('fmincon','Display','none','Algorithm','sqp', 'MaxIterations',75,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);
 
 
 f = @(x)fmincon_cost_function(x, params); %create wrapper for cost function
@@ -62,7 +62,8 @@ for i=1:2000
     
     plot_car(X_x, track);
     x = bycicle_step(x, u, Ts);
-    
+    [c, idx] = get_c(x, track);
+    x(ModelParams.stateindex_theta) = track.progress(1, idx);
     X_x(1,:) = x';
     X_u(1,:) = X_u(2,:);
     for j=2:Horizon

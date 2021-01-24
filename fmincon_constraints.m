@@ -8,8 +8,8 @@ function [cineq, ceq, cineq_grad, ceq_grad] = fmincon_constraints(X_flat,params)
     n = ModelParams.nx + ModelParams.nu;
     trackWidth = params.trackWidth;
     track = params.track;
-    cineq = zeros(Horizon+Horizon-1, 1);
-    cineq_grad = zeros(Horizon*(ModelParams.nx+ModelParams.nu), Horizon+Horizon-1);
+    cineq = zeros(Horizon, 1);
+    cineq_grad = zeros(Horizon*(ModelParams.nx+ModelParams.nu), Horizon);
     last_idx = 0;
     for i=1:Horizon
        state_i = X_x(i,:)';
@@ -17,13 +17,18 @@ function [cineq, ceq, cineq_grad, ceq_grad] = fmincon_constraints(X_flat,params)
 
        x_i = state_i(ModelParams.stateindex_x);
        y_i = state_i(ModelParams.stateindex_y);
-       
-%        p = round(([x_i; y_i]-[track.xmin;track.ymin])/track.step); % get rows and cols for current position on distance mat
-%        [rows, cols] = size(track.D); % get num rows and cols of distance matrix
-%        p = max(p,1);
-%        p = min(p,[cols;rows-1]);
-%        err = track.D(rows-p(2), p(1)); % evaluate distance from [xc, yc]
-%        err = double(err);  
+       theta_i = state_i(ModelParams.stateindex_theta);
+
+      [~, idx] = min(abs(track.progress(1,:)-theta_i));
+
+      if (idx > 1)
+        tmp_idx = idx-1;
+      else
+        tmp_idx = idx+1;
+      end
+      xc_i = ((track.center_rounded(1,idx) - track.center_rounded(1,tmp_idx)) / (track.progress(1,idx) - track.progress(1,tmp_idx))) * (theta_i - track.progress(1,idx)) + track.center_rounded(1,idx); %linear interpolation for xc
+      yc_i = ((track.center_rounded(2,idx) - track.center_rounded(2,tmp_idx)) / (track.progress(1,idx) - track.progress(1,tmp_idx))) * (theta_i - track.progress(1,idx)) + track.center_rounded(2,idx); %linear interpolation for yc
+      c = [xc_i;yc_i];
        
        [c,idx] = get_c([x_i;y_i], track);
        err = norm([x_i;y_i]-c);
@@ -34,10 +39,6 @@ function [cineq, ceq, cineq_grad, ceq_grad] = fmincon_constraints(X_flat,params)
        cineq_grad((ModelParams.nx+ModelParams.nu)*(i-1) + 2, i) = cineq_grad((ModelParams.nx+ModelParams.nu)*(i-1) + 2, i) + derr_dy;
        cineq(i) = err - trackWidth/2;
        
-       if (i>1)
-           cineq(Horizon+i-1) = last_idx - idx;
-       end
-       last_idx = idx;
     end
     
     

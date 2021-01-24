@@ -1,24 +1,21 @@
 clear all
 clc
-fn = @(n) 4*n+5  % retta y=4x+5
+rng(0,'twister'); % For reproducibility
+n = 1000;
+x = linspace(-10,10,n)';
+y = 1 + x*5e-2 + sin(x)./x + 0.2*randn(n,1);
 
-x_min = 0.5
-x_max = 5
-step = 0.1
+kfcn = @(XN,XM,theta) (exp(theta(2))^2)*exp(-(pdist2(XN,XM).^2)/(2*exp(theta(1))^2));
+sigmaL0 = exp(1.5);
+sigmaF0 = exp(0.2);
+gprMdl = fitrgp(x,y,'KernelFunction','squaredexponential','KernelParameters',[sigmaL0,sigmaF0]);
+L = resubLoss(gprMdl)
 
-X = [x_min:step:x_max]
 
-y = []
-for i=1:length(X)
-   y = [y fn(X(i))+0.5*(rand()-0.5)];
-end
+scatter(x, y)
 
-scatter(X, y)
-
-model = fitrgp(X',y');
-
-xnew = 10
-ypred = predict(model, xnew)
-
+xnew= 0
+ynew = predict(gprMdl, xnew);
 hold on
-scatter(xnew, ypred, 'filled')
+scatter(xnew, ynew, 'filled')
+plot(x, 1 + x*5e-2 + sin(x)./x)
