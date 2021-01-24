@@ -4,7 +4,7 @@ load track.mat
 
 Ts = 0.05;
 
-startIdx = 50;
+startIdx = 600;
 last_closestIdx = startIdx;
 
 ModelParams = bycicle_params();
@@ -43,7 +43,7 @@ options = optimoptions('fmincon','Display','none','Algorithm','sqp', 'MaxIterati
 f = @(x)fmincon_cost_function(x, params); %create wrapper for cost function
 nonlcon = @(x)fmincon_constraints(x, params); % create wrapper for constr func
 
-for i=1:100
+for i=1:2000
     [A, b, Aeq, beq, lb, ub] = getMatrices(X_flat, params);
     [X_flat_new, fval, exitflag, output] = fmincon(f,X_flat,A,b,Aeq,beq,lb,ub,nonlcon,options);
     X_new = reshape(X_flat_new, [], Horizon)';

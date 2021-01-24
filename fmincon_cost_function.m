@@ -41,10 +41,12 @@ function [final_cost] = fmincon_cost_function(X_flat, params)
 
        progress = track.progress(last_idx, idx);
         
-       if i<=1
+       if i > 1 && idx > 1
+           lreg = (norm(input_i - X_u(i-1,:)'))^2 + (norm(progress - track.progress(last_idx,idx-1)))^2; 
+           final_cost = final_cost + 5*ec_i^2 + 5*el_i^2-0.6*progress + lreg; 
+
+       else
            final_cost = final_cost + 5*ec_i^2 + 5*el_i^2-progress; % mancalreg
-       elseif i>1
-           final_cost = final_cost + 5*ec_i^2 + 5*el_i^2-0.6*progress+ (norm(input_i - X_u(i-1,:)'))^2 + (norm(progress - track.progress(last_idx,idx-1)))^2 ; 
        end
        last_idx = idx;
     end
