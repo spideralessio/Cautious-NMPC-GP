@@ -30,16 +30,22 @@ function [final_cost] = fmincon_cost_function(X_flat, params)
        yc_i = track.center_rounded(2,idx);
        if idx == length(track.center)
            phi_i = atan2(track.center_rounded(2,1)- yc_i, track.center_rounded(1,1)- xc_i);
+           
        else
            phi_i = atan2(track.center_rounded(2,idx+1)- yc_i, track.center_rounded(1,idx+1)- xc_i);
+           
        end
        
        el_i = -cos(phi_i)*(x_i - xc_i) - sin(phi_i)*(y_i-yc_i);
        ec_i = sin(phi_i)*(x_i - xc_i) - cos(phi_i)*(y_i-yc_i);
 
        progress = track.progress(last_idx, idx);
-
-       final_cost = final_cost + 5*ec_i^2 + 5*el_i^2;% -progress; % mancalreg
+        
+       if i<=1
+           final_cost = final_cost + 5*ec_i^2 + 5*el_i^2-progress; % mancalreg
+       elseif i>1
+           final_cost = final_cost + 5*ec_i^2 + 5*el_i^2-0.6*progress+ (norm(input_i - X_u(i-1,:)'))^2 + (norm(progress - track.progress(last_idx,idx-1)))^2 ; 
+       end
        last_idx = idx;
     end
 end
