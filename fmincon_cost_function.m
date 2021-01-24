@@ -9,8 +9,9 @@ function [final_cost, cost_gradient] = fmincon_cost_function(X_flat, params)
     final_cost = 0;
     track = params.track;
     trackWidth = params.trackWidth;
-    gamma = 0.6;
+    gamma = 0.2;
     error_factor = 5;
+    reg_factor = 10;
     last_idx = 0;
     
     cost_gradient = zeros(size(X_flat));
@@ -49,12 +50,12 @@ function [final_cost, cost_gradient] = fmincon_cost_function(X_flat, params)
        
        cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + 1) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + 1) + error_factor*del2_dxi + error_factor*dec2_dxi;
        cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + 2) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + 2) + error_factor*del2_dyi + error_factor*dec2_dyi;
+       cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx + 1) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1)  + ModelParams.nx + 1) - gamma;
        
-       
-       progress = track.progress(last_idx, idx);
+       progress = input_i(1);
         
        if i > 1 && idx > 1
-           lreg = (norm(input_i - X_u(i-1,:)'))^2 + (norm(progress - track.progress(last_idx,idx-1)))^2; 
+           lreg = (norm(input_i - X_u(i-1,:)'))^2;% + (norm(progress - track.progress(last_idx,idx-1)))^2; 
            D1 = X_u(i-1,1);
            D2 = X_u(i,1);
            delta1 = X_u(i-1,2);
@@ -64,12 +65,12 @@ function [final_cost, cost_gradient] = fmincon_cost_function(X_flat, params)
            dlreg_ddelta1 = 2*(delta1 - delta2);
            dlreg_ddelta2 = 2*(delta2 - delta1);
            
-           cost_gradient((ModelParams.nx+ModelParams.nu)*(i-2) + ModelParams.nx+ 1) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-2) + ModelParams.nx+ 1) + dlreg_dD1;
-           cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx+ 1) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx+ 1) + dlreg_dD2;
-           cost_gradient((ModelParams.nx+ModelParams.nu)*(i-2) + ModelParams.nx+ 2) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-2) + ModelParams.nx+ 2) + dlreg_ddelta1;
-           cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx+ 2) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx+ 2) + dlreg_ddelta2;
+           cost_gradient((ModelParams.nx+ModelParams.nu)*(i-2) + ModelParams.nx+ 1) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-2) + ModelParams.nx+ 1) + reg_factor*dlreg_dD1;
+           cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx+ 1) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx+ 1) + reg_factor*dlreg_dD2;
+           cost_gradient((ModelParams.nx+ModelParams.nu)*(i-2) + ModelParams.nx+ 2) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-2) + ModelParams.nx+ 2) + reg_factor*dlreg_ddelta1;
+           cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx+ 2) = cost_gradient((ModelParams.nx+ModelParams.nu)*(i-1) + ModelParams.nx+ 2) + reg_factor*dlreg_ddelta2;
            
-           final_cost = final_cost + error_factor*ec_i^2 + error_factor*el_i^2-gamma*progress + lreg; 
+           final_cost = final_cost + error_factor*ec_i^2 + error_factor*el_i^2-gamma*progress + reg_factor*lreg; 
        else
            final_cost = final_cost + error_factor*ec_i^2 + error_factor*el_i^2-gamma*progress; % mancalreg
        end

@@ -8,8 +8,9 @@ function [cineq, ceq, cineq_grad, ceq_grad] = fmincon_constraints(X_flat,params)
     n = ModelParams.nx + ModelParams.nu;
     trackWidth = params.trackWidth;
     track = params.track;
-    cineq = zeros(Horizon, 1);
-    cineq_grad = zeros(Horizon*(ModelParams.nx+ModelParams.nu), Horizon);
+    cineq = zeros(Horizon+Horizon-1, 1);
+    cineq_grad = zeros(Horizon*(ModelParams.nx+ModelParams.nu), Horizon+Horizon-1);
+    last_idx = 0;
     for i=1:Horizon
        state_i = X_x(i,:)';
        input_i = X_u(i,:)';
@@ -24,7 +25,7 @@ function [cineq, ceq, cineq_grad, ceq_grad] = fmincon_constraints(X_flat,params)
 %        err = track.D(rows-p(2), p(1)); % evaluate distance from [xc, yc]
 %        err = double(err);  
        
-       c = get_c([x_i;y_i], track);
+       [c,idx] = get_c([x_i;y_i], track);
        err = norm([x_i;y_i]-c);
        
        derr_dx = (x_i - c(1))/err;
@@ -33,6 +34,10 @@ function [cineq, ceq, cineq_grad, ceq_grad] = fmincon_constraints(X_flat,params)
        cineq_grad((ModelParams.nx+ModelParams.nu)*(i-1) + 2, i) = cineq_grad((ModelParams.nx+ModelParams.nu)*(i-1) + 2, i) + derr_dy;
        cineq(i) = err - trackWidth/2;
        
+       if (i>1)
+           cineq(Horizon+i-1) = last_idx - idx;
+       end
+       last_idx = idx;
     end
     
     

@@ -1,4 +1,4 @@
-function [c] = get_c(x,track)
+function [c,idx] = get_c(x,track)
     p = round((x(1:2)-[track.xmin;track.ymin])/track.step); % get rows and cols for current position on distance mat
     [rows, cols] = size(track.D); % get num rows and cols of distance matrix
     p = max(p,1);
