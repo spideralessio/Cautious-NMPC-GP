@@ -1,5 +1,9 @@
-function [grad]=DiscretizedLinearizedModel(Xbar_k,Ubar_k)
-  ModelParams = bycicle_params();
+function [grad]=bycicle_model_grad(Xbar_k,Ubar_k, params)
+  if params.modified
+        load('modified_bycicle_params.mat');
+    else
+        ModelParams = bycicle_params();
+    end
   sx=ModelParams.sx-1;
   su=ModelParams.su-1;
   

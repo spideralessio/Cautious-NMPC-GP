@@ -1,10 +1,12 @@
-function [] = plot_car(X, track)
+function [] = plot_car(X, track, T, lap)
     ModelParams = bycicle_params();
     hold off
     figure(1);
     plot(track.outer(1,:),track.outer(2,:),'r')
     hold on
     plot(X(:,1), X(:,2), 'b');
+    text(-1.25, 1.8, join(['T: ', num2str(T), 's']));
+    text(-0.75, 1.8, join(['Lap: ', num2str(lap)]));
     c = [];
     [l, ~] = size(X);
     % for j=1:l

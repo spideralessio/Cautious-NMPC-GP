@@ -4,11 +4,11 @@ load track.mat
 
 Ts = 0.03;
 
-startIdx = 30;
+startIdx = 1;
 
 ModelParams = bycicle_params();
 
-vx0 = 1;
+vx0 = 0;
 
 trackWidth = norm(track.inner(:,1)-track.outer(:,1));
 
@@ -24,6 +24,7 @@ params.track = track;
 params.trackWidth = trackWidth;
 params.Horizon = Horizon;
 params.Ts = Ts;
+params.modified = true;
 
 
 
@@ -42,6 +43,14 @@ options = optimoptions('fmincon','Display','none','Algorithm','sqp', 'MaxIterati
 f = @(x)fmincon_cost_function(x, params); %create wrapper for cost function
 nonlcon = @(x)fmincon_constraints(x, params); % create wrapper for constr func
 
+
+% data = struct;
+% data.u = [];
+% data.x = [];
+
+T = 0;
+lap = 1;
+prev_idx = startIdx;
 for i=1:2000
     [A, b, Aeq, beq, lb, ub] = getMatrices(X_flat, params);
     [X_flat_new, fval, exitflag, output] = fmincon(f,X_flat,A,b,Aeq,beq,lb,ub,nonlcon,options);
@@ -59,7 +68,9 @@ for i=1:2000
     fval
     
     
-    plot_car(X_x, track);
+    plot_car(X_x, track, T, lap);
+%     data.x = [data.x,x];
+%     data.u = [data.u,u];
     x = bycicle_step(x, u, Ts);
     [c, idx] = get_c(x, track);
     x(ModelParams.stateindex_theta) = track.progress(1, idx);
@@ -68,7 +79,12 @@ for i=1:2000
     for j=2:Horizon
         X_x(j,:) = X_x(j-1,:) + Ts*bycicle_model(X_x(j-1,:)', X_u(j-1,:)', params)';
     end
+    T = T+Ts;
     X = [X_x, X_u];
     X_flat = reshape(X',[],1);
-    
+    if (prev_idx > idx)
+        lap = lap+1;
+    end
+    prev_idx = idx;
+
 end

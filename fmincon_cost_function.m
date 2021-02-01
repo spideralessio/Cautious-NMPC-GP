@@ -1,5 +1,11 @@
 function [final_cost, cost_gradient] = fmincon_cost_function(X_flat, params)
-    ModelParams=bycicle_params();
+    if params.modified
+        load('modified_bycicle_params.mat');
+    else
+        ModelParams = bycicle_params();
+    end
+
+
     Horizon = params.Horizon;
     X = reshape(X_flat, [], Horizon)';
     X_x = X(:, 1:ModelParams.nx);

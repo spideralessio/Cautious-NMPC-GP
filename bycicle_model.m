@@ -1,7 +1,9 @@
 function xdot=bycicle_model(x,u,params)
-    
-    ModelParams = bycicle_params();
-
+    if params.modified
+        load('modified_bycicle_params.mat');
+    else
+        ModelParams = bycicle_params();
+    end
     Cm1=ModelParams.Cm1;
     Cm2=ModelParams.Cm2;
     Cr0=ModelParams.Cr0;
