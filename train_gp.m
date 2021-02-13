@@ -18,24 +18,32 @@ f = zeros(size(y));
 Ts = 0.03
 params = struct;
 params.modified = true;
-
+prova = y;
 for i=1:length(f)
-    f(:,i) = Ts*bycicle_model(data.x(:,i), data.u(:,i), params);
+    f(:,i) = data.x(:,i) + Ts*bycicle_model(data.x(:,i), data.u(:,i), params);
+    %f(:,i) = bycicle_step(data.x(:,i), data.u(:,i), Ts);
+
 end
 
 y = Bd_pinv*(y - f);
  
 y = y';
 
-kfcn = @(XN,XM,theta) (theta(2)^2)*exp(-(pdist2(XN,XM).^2)/(2*theta(1)^2));
-kfcn_prime = @(XN, XM, theta) ((theta(2)/theta(1))^2)*(theta(1)^2 - pdist2(XN, XM).^2)*exp(-(pdist2(XN,XM).^2)/(2*theta(1)^2))
+X_tilde = [X,ones(length(X),1)];
+
+% y = wx + b
+% y = wX
+% X = [x 1]
+
+%3x11
+%522x11
+
+W = pinv(X_tilde)*y;
+
+w = W(1:length(W)-1,:)
+b = W(length(W),:)
 
 
-sigmaL0 = exp(1);
-sigmaF0 = exp(0.2);
-gprMdl = fitrgp(X,y(:,1),'KernelFunction',kfcn_prime,'KernelParameters',[sigmaL0,sigmaF0]);
-L = resubLoss(gprMdl)
-modelX = fitrgp(X, y(:,1));
-modelY = fitrgp(X, y(:,2));
-modelPhi = fitrgp(X, y(:,3));
+
+
 

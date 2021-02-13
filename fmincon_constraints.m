@@ -45,17 +45,16 @@ function [cineq, ceq, cineq_grad, ceq_grad] = fmincon_constraints(X_flat,params)
        
     end
     
-    Bd = [zeros(3); eye(3); zeros(1,3);
+    Bd = [zeros(3); eye(3); zeros(1,3)];
     ceq = zeros((Horizon-1)*ModelParams.nx,1);
     ceq_grad = zeros(Horizon*(ModelParams.nx+ModelParams.nu), (Horizon-1)*ModelParams.nx);
     for i=1:Horizon-1
         state_i = X_x(i,:)';
         input_i = X_u(i,:)';
-        state_next = state_i + params.Ts*bycicle_model(state_i, input_i, params) + Bd*evaluate_gp(state_i, input_i);
+        state_next = state_i + params.Ts*bycicle_model(state_i, input_i, params);% + Bd*evaluate_gp(state_i, input_i);
         constraint_indexes = [1:ModelParams.nx] + (i-1)*ModelParams.nx;
         ceq(constraint_indexes,1) = X_x(i+1,:)' - state_next;
-        
-        f_grad = - params.Ts*bycicle_model_grad(state_i, input_i, params);
+        f_grad = - params.Ts*bycicle_model_grad(state_i, input_i, params);% - (Bd*evaluate_gp_deriv(state_i, input_i))';
                 
         ceq_grad((ModelParams.nx+ModelParams.nu)*(i-1) + [1:ModelParams.nx+ModelParams.nu], constraint_indexes) = ceq_grad((ModelParams.nx+ModelParams.nu)*(i-1) + [1:ModelParams.nx+ModelParams.nu], constraint_indexes) + f_grad; % derivative wrt cur state&inp
        
