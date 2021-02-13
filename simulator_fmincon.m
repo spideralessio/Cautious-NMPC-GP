@@ -24,14 +24,14 @@ params.track = track;
 params.trackWidth = trackWidth;
 params.Horizon = Horizon;
 params.Ts = Ts;
-params.modified = false;
+params.modified = true;
 Bd = [zeros(3); eye(3); zeros(1,3)];
 
 
 X_x = repmat(x0', Horizon, 1); %(horizon, nx)
 X_u = repmat(u0', Horizon, 1); %(horizon, nu)
 for i=2:Horizon
-    X_x(i,:) = X_x(i-1,:) + Ts*bycicle_model(X_x(i-1,:)', X_u(i-1,:)', params)';% + (Bd*evaluate_gp(X_x(i-1,:)', X_u(i-1,:)'))';
+    X_x(i,:) = X_x(i-1,:) + Ts*bycicle_model(X_x(i-1,:)', X_u(i-1,:)', params)' + (Bd*evaluate_gp(X_x(i-1,:)', X_u(i-1,:)'))';
 end
 
 
@@ -51,7 +51,7 @@ data.x = [];
 T = 0;
 lap = 1;
 prev_idx = startIdx;
-for i=1:100
+for i=1:3000
     [A, b, Aeq, beq, lb, ub] = getMatrices(X_flat, params);
     [X_flat_new, fval, exitflag, output] = fmincon(f,X_flat,A,b,Aeq,beq,lb,ub,nonlcon,options);
     X_new = reshape(X_flat_new, [], Horizon)';
@@ -77,7 +77,7 @@ for i=1:100
     X_x(1,:) = x';
     X_u(1,:) = X_u(2,:);
     for j=2:Horizon
-        X_x(j,:) = X_x(j-1,:) + Ts*bycicle_model(X_x(j-1,:)', X_u(j-1,:)', params)';% + (Bd*evaluate_gp(X_x(j-1,:)', X_u(j-1,:)'))';
+        X_x(j,:) = X_x(j-1,:) + Ts*bycicle_model(X_x(j-1,:)', X_u(j-1,:)', params)' + (Bd*evaluate_gp(X_x(j-1,:)', X_u(j-1,:)'))';
     end
     T = T+Ts;
     X = [X_x, X_u];
@@ -86,5 +86,9 @@ for i=1:100
         lap = lap+1;
     end
     prev_idx = idx;
+    
+    if lap == 2
+        break
+    end
 
 end
