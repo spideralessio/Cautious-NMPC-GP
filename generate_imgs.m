@@ -2,7 +2,7 @@ clear all
 clc
 close all
 
-laps = {'noprogress_lap', 'base_lap', 'noise_lap', 'gp_lap'}
+laps = {'noprogressLap', 'baseLap', 'noiseLap', 'gpLap'}
 load('track.mat');
 
 % for j=1:length(laps)
@@ -39,10 +39,31 @@ hold off
     plot(track.inner(1,:),track.inner(2,:),'r')
     plot(track.center(1,:),track.center(2,:),'--r')
 plots = [];
+
+clrs = [
+    0.8 0.7 0;
+    0.9 0.3 0;
+    0 0.2 1;
+    0 0.5 0.5
+]
+colororder(clrs);
+
 for j=1:length(laps)
     lap_name = laps{j};
     load(strcat(lap_name, '.mat'));
-    plots = [plots plot(data.x(1,:), data.x(2,:))];
+    plots = [plots plot(data.x(1,:), data.x(2,:), 'LineWidth', 3)];
 end
-legend(plots, laps);
+
+lgd = legend(plots, laps);
+lgd.FontSize = 16;
+
 axis([-1.5,2.7,-2,2.5])
+%saveas(gcf, 'laps.jpg')
+%set(gcf, 'Position', [0 0 500, 500]);
+%print(gcf, 'laps_20.png', '-dpng', '-r300');
+
+for j=1:length(laps)
+    lap_name = laps{j}
+    load(strcat(lap_name, '.mat'));
+    length(data.x) * 0.03
+end

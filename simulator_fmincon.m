@@ -24,20 +24,20 @@ params.track = track;
 params.trackWidth = trackWidth;
 params.Horizon = Horizon;
 params.Ts = Ts;
-params.modified = false;
+params.modified = true;
 Bd = [zeros(3); eye(3); zeros(1,3)];
 
 
 X_x = repmat(x0', Horizon, 1); %(horizon, nx)
 X_u = repmat(u0', Horizon, 1); %(horizon, nu)
 for i=2:Horizon
-    X_x(i,:) = X_x(i-1,:) + Ts*bycicle_model(X_x(i-1,:)', X_u(i-1,:)', params)';% + (Bd*evaluate_gp(X_x(i-1,:)', X_u(i-1,:)'))';
+    X_x(i,:) = X_x(i-1,:) + Ts*bycicle_model(X_x(i-1,:)', X_u(i-1,:)', params)'; % (Bd*evaluate_gp(X_x(i-1,:)', X_u(i-1,:)'))';
 end
 
 
 X = [X_x, X_u]; %(horizon, n) = (horizon, nx+nu)
 X_flat = reshape(X',[],1); %(horizon*n,1)
-options = optimoptions('fmincon','Display','none','Algorithm','sqp', 'MaxIterations',50,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);
+options = optimoptions('fmincon','Display','none','Algorithm','sqp', 'MaxIterations', 50,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);
 
 
 f = @(x)fmincon_cost_function(x, params); %create wrapper for cost function

@@ -1,4 +1,4 @@
-random_num = @()(rand - 0.5)*2*0.15;
+random_num = @()(rand - 0.5)*2*0.25;
 edit_params = @(x) x+x*random_num();
 ModelParams = bycicle_params();
 
@@ -19,3 +19,4 @@ ModelParams.Df = edit_params(ModelParams.Df)
 ModelParams.L = edit_params(ModelParams.L)
 ModelParams.W = edit_params(ModelParams.W)
 
+save('modified_bycicle_params.mat', 'ModelParams');

@@ -30,6 +30,9 @@ y = y';
 training_data = struct;
 training_data.X = X;
 training_data.y = y;
+
+
+
 save('data/training_data.mat','training_data');
 
 % // kfcn = @(XN,XM,theta) (theta(2)^2)*exp(-(pdist2(XN,XM).^2)/(2*theta(1)^2));
@@ -43,4 +46,5 @@ save('data/training_data.mat','training_data');
 % // modelX = fitrgp(X, y(:,1));
 % // modelY = fitrgp(X, y(:,2));
 % // modelPhi = fitrgp(X, y(:,3));
+
 

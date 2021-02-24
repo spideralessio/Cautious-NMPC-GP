@@ -43,7 +43,33 @@ W = pinv(X_tilde)*y;
 w = W(1:length(W)-1,:)
 b = W(length(W),:)
 
+save('gp_model.mat', 'w', 'b');
 
 
+y_hat = X_tilde * W;
 
+set(0, 'DefaultLineLineWidth', 3);
 
+p1 = subplot(1, 3, 1);
+hold on
+plot(y(:,1))
+plot(y_hat(:,1))
+lgd = legend('GroundTruth', 'Prediction')
+lgd.FontSize = 16;
+
+p2 = subplot(1, 3, 2);
+hold on
+plot(y(:,2))
+plot(y_hat(:,2))
+lgd = legend('GroundTruth', 'Prediction')
+lgd.FontSize = 16;
+
+p3 = subplot(1, 3, 3);
+hold on
+plot(y(:,3))
+plot(y_hat(:,3))
+
+lgd = legend('GroundTruth', 'Prediction')
+lgd.FontSize = 16;
+
+% print(gcf, 'training_results.png', '-dpng', '-r300');
