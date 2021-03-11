@@ -6,7 +6,5 @@ function [ypred] = evaluate_gp(x,u)
     else
         ypred = zeros(3, 1);
     end
-    
-    ypred
 end
 
