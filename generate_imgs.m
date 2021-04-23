@@ -2,7 +2,7 @@ clear all
 clc
 close all
 
-laps = {'noprogressLap', 'baseLap', 'noiseLap', 'gpLap'}
+laps = {'noiseLap', 'lrLap'}
 load('track.mat');
 
 % for j=1:length(laps)

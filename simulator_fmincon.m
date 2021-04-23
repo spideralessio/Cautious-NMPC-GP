@@ -4,7 +4,7 @@ load track.mat
 
 Ts = 0.03;
 
-startIdx = 1;
+startIdx = 30;
 
 ModelParams = bycicle_params();
 

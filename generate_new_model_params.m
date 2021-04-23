@@ -1,4 +1,4 @@
-random_num = @()(rand - 0.5)*2*0.25;
+random_num = @()(rand - 0.5)*2*0.15;
 edit_params = @(x) x+x*random_num();
 ModelParams = bycicle_params();
 
