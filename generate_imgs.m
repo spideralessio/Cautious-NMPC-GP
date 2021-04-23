@@ -3,6 +3,7 @@ clc
 close all
 
 laps = {'noiseLap', 'lrLap'}
+% laps = {'noprogressLap', 'baseLap', 'noiseLap', 'lrLap'}
 load('track.mat');
 
 % for j=1:length(laps)
@@ -34,17 +35,17 @@ load('track.mat');
 close all
 hold off
     figure(1);
-    plot(track.outer(1,:),track.outer(2,:),'r')
+    plot(track.outer(1,:),track.outer(2,:), 'black')
     hold on
-    plot(track.inner(1,:),track.inner(2,:),'r')
-    plot(track.center(1,:),track.center(2,:),'--r')
+    plot(track.inner(1,:),track.inner(2,:), 'black')
+    % plot(track.center(1,:),track.center(2,:),'--r')
 plots = [];
 
 clrs = [
-    0.8 0.7 0;
-    0.9 0.3 0;
-    0 0.2 1;
-    0 0.5 0.5
+    %0.8 0.2 0;  % base
+    %0 0.2 1;   % noprogress
+    %0.40 0.63 0.55; % noise
+    %0.4 0.7 0.8   % lr
 ]
 colororder(clrs);
 
@@ -55,9 +56,10 @@ for j=1:length(laps)
 end
 
 lgd = legend(plots, laps);
-lgd.FontSize = 16;
+lgd.FontSize = 18;
 
-axis([-1.5,2.7,-2,2.5])
+axis([-1.5,1.9,-2,1.9])
+set(gca, "XColor", 'none', 'YColor', 'none')
 %saveas(gcf, 'laps.jpg')
 %set(gcf, 'Position', [0 0 500, 500]);
 %print(gcf, 'laps_20.png', '-dpng', '-r300');
